@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pàgina no trobada — L'Habitatge d'Avui</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F6;
+    --ink:#141414;
+    --ink-soft:#5A5A54;
+    --rule:#E3E0D6;
+    --brick:#2F5FFF;
+    --gold:#6E8CFF;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--ink); color:#fff;
+    font-family:'Public Sans', sans-serif; -webkit-font-smoothing:antialiased;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    position:relative; overflow:hidden; text-align:center;
+  }
+  body::after{
+    content:"HABITATGE · HABITATGE · HABITATGE · HABITATGE · ";
+    position:absolute; bottom:-6px; left:0; white-space:nowrap;
+    font-family:'Archivo Black'; font-size:15vw; line-height:1; color:rgba(255,255,255,0.045);
+    animation:scroll-marquee 22s linear infinite; pointer-events:none;
+  }
+  @keyframes scroll-marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .wrap{ position:relative; z-index:2; max-width:520px; }
+  .eyebrow{
+    font-family:'Public Sans'; text-transform:uppercase; letter-spacing:0.14em;
+    font-size:11.5px; font-weight:700; color:var(--gold);
+  }
+  .ticket{
+    display:inline-block; background:#fff; color:var(--ink); border-radius:16px;
+    padding:22px 30px; margin:22px 0 26px; box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    transform:rotate(-2deg); position:relative;
+  }
+  .ticket::before{
+    content:"NO DISPONIBLE"; position:absolute; top:-12px; left:20px;
+    background:var(--ink); color:#fff; font-size:10px; letter-spacing:0.12em;
+    font-weight:700; padding:4px 12px; border-radius:999px;
+  }
+  .ticket .code{ font-family:'Archivo Black'; font-size:52px; color:var(--brick); line-height:1; }
+  .ticket .label{ font-size:12px; color:var(--ink-soft); margin-top:6px; text-transform:uppercase; letter-spacing:0.05em; }
+  h1{
+    font-family:'Space Grotesk'; font-weight:700; font-size:clamp(24px,4vw,32px);
+    margin:0 0 12px; line-height:1.25;
+  }
+  p{ font-size:15px; color:#C7C4B8; line-height:1.6; max-width:44ch; margin:0 auto 30px; }
+  .btn{
+    font-family:'Public Sans'; font-weight:700; font-size:13px; letter-spacing:0.03em;
+    text-transform:uppercase; padding:13px 26px; border-radius:999px; cursor:pointer;
+    border:2px solid var(--brick); background:var(--brick); color:#fff; text-decoration:none;
+    display:inline-block; transition:transform .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">L'Habitatge d'Avui</div>
+    <div class="ticket">
+      <div class="code">404</div>
+      <div class="label">Pàgina no trobada</div>
+    </div>
+    <h1>Aquest habitatge no existeix... o s'ha esgotat.</h1>
+    <p>La pàgina que busques s'ha mogut, s'ha eliminat o mai ha existit. Torna a la portada per seguir explorant la revista, les notícies i les dades.</p>
+    <a class="btn" href="/">Tornar a l'inici</a>
+  </div>
+</body>
+</html>

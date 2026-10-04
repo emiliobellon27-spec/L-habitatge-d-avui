@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Habitatge d'Avui — L'habitatge és un dret, no un privilegi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root{
+    --paper:#FAF9F6;
+    --paper-2:#F1EFE9;
+    --ink:#141414;
+    --ink-soft:#5A5A54;
+    --rule:#E3E0D6;
+    --brick:#2F5FFF;
+    --brick-dark:#1E3FCC;
+    --slate:#1F2A44;
+    --gold:#6E8CFF;
+    --card:#FFFFFF;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--brick); color:#fff;}
+  a{color:inherit;}
+
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin:0;
+  }
+  .eyebrow{
+    font-family:'Public Sans', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--brick);
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    position:sticky; top:0; z-index:50;
+    background:var(--paper);
+    border-bottom:2px solid var(--ink);
+  }
+  .masthead-top{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:1180px; margin:0 auto; padding:10px 24px 6px;
+    font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--ink-soft); border-bottom:1px solid var(--rule);
+  }
+  .masthead-main{
+    max-width:1180px; margin:0 auto; padding:18px 24px 14px;
+    display:flex; align-items:baseline; justify-content:space-between; gap:24px;
+    flex-wrap:wrap;
+  }
+  .logo{
+    font-family:'Archivo Black', sans-serif; font-weight:400;
+    font-size:clamp(24px,3.6vw,38px);
+    letter-spacing:-0.01em; text-transform:uppercase;
+    display:flex; align-items:baseline; gap:10px;
+  }
+  .logo .key{
+    color:var(--brick);
+  }
+  .tagline{
+    font-size:13px; color:var(--ink-soft);
+    font-family:'Space Grotesk', sans-serif; font-weight:500;
+    max-width:260px; text-align:right;
+  }
+  nav.primary{
+    background:var(--ink); color:var(--paper);
+  }
+  nav.primary ul{
+    max-width:1180px; margin:0 auto; padding:0 24px;
+    display:flex; list-style:none; gap:2px; flex-wrap:wrap;
+  }
+  nav.primary button{
+    background:none; border:none; color:var(--paper);
+    font-family:'Public Sans'; font-weight:700; font-size:13.5px;
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding:13px 16px; cursor:pointer; position:relative;
+  }
+  nav.primary button.active{ color:#fff; }
+  nav.primary button.active::after{
+    content:""; position:absolute; left:16px; right:16px; bottom:0; height:3px;
+    background:var(--brick);
+  }
+  nav.primary button:hover{ color:#fff; }
+
+  section.view{ display:none; }
+  section.view.active{ display:block; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:64px 0 48px;
+    background:var(--brick);
+    color:#fff;
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:"HABITATGE · HABITATGE · HABITATGE · HABITATGE · ";
+    position:absolute; bottom:-6px; left:0; white-space:nowrap;
+    font-family:'Archivo Black'; font-size:15vw; line-height:1; color:rgba(255,255,255,0.07);
+    animation:scroll-marquee 22s linear infinite; pointer-events:none;
+  }
+  @keyframes scroll-marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .hero-grid{
+    display:grid; grid-template-columns:1.15fr 0.85fr; gap:44px; align-items:end;
+    position:relative; z-index:2;
+  }
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
+  .hero h1.display{
+    font-family:'Archivo Black', sans-serif; font-weight:400;
+    text-transform:uppercase;
+    font-size:clamp(34px,5.4vw,64px);
+    line-height:0.96;
+    margin-top:10px;
+    color:#fff;
+  }
+  .hero h1.display em{
+    font-style:normal; color:var(--ink);
+    background:#fff; padding:0 8px;
+  }
+  .hero p.lede{
+    font-size:17px; line-height:1.55; color:rgba(255,255,255,0.88);
+    margin-top:16px; max-width:56ch;
+  }
+  .hero-actions{ display:flex; gap:12px; margin-top:22px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Public Sans'; font-weight:700; font-size:13px;
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding:13px 22px; border-radius:999px;
+    cursor:pointer; border:2px solid var(--ink);
+    background:var(--ink); color:#fff;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .hero .btn{ border-color:#fff; background:#fff; color:var(--ink); }
+  .hero .btn.ghost{ background:transparent; color:#fff; border-color:#fff; }
+
+  /* ticket / signature element */
+  .ticket{
+    background:#fff;
+    border:none; border-radius:16px;
+    padding:24px 24px 20px;
+    position:relative;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+    transform:rotate(-2deg);
+  }
+  .ticket::before{
+    content:"SE LLOGA — SE VEN";
+    position:absolute; top:-12px; left:20px;
+    background:var(--ink); color:#fff;
+    font-size:10px; letter-spacing:0.12em; font-weight:700;
+    padding:4px 12px; border-radius:999px;
+  }
+  .ticket-row{ display:flex; justify-content:space-between; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule); }
+  .ticket-row:last-of-type{ border-bottom:none; }
+  .ticket-row .label{ font-size:12.5px; color:var(--ink-soft); }
+  .ticket-row .val{ font-family:'Zilla Slab'; font-weight:700; font-size:20px; }
+  .ticket-row .val.up{ color:var(--brick); }
+  .ticket-foot{ font-size:11px; color:var(--ink-soft); margin-top:12px; }
+
+  /* ---------- Section headers ---------- */
+  .section-head{
+    display:flex; align-items:baseline; gap:14px; margin:56px 0 24px;
+  }
+  .section-head h2{ font-size:26px; white-space:nowrap; }
+  .section-head .rule{ flex:1; height:1px; background:var(--rule); }
+  .section-head .count{ font-size:12px; color:var(--ink-soft); }
+
+  /* ---------- Revista cards ---------- */
+  .mag-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    border-top:1px solid var(--ink); border-left:1px solid var(--rule);
+  }
+  @media (max-width:860px){ .mag-grid{grid-template-columns:1fr;} }
+  .mag-card{
+    border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:24px; background:var(--paper);
+    cursor:pointer; transition:background .15s ease;
+    display:flex; flex-direction:column; min-height:190px;
+  }
+  .mag-card:hover{ background:var(--card); }
+  .mag-num{ font-family:'Zilla Slab'; color:var(--brick); font-weight:700; font-size:13px; }
+  .mag-card h3{ font-size:19px; margin-top:10px; line-height:1.2; }
+  .mag-card p{ font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin-top:10px; flex:1; }
+  .mag-card .read{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-top:14px; color:var(--ink);}
+
+  .mag-detail{
+    display:none; margin:26px 0 10px; padding:26px 28px; background:var(--card);
+    border-left:4px solid var(--brick);
+  }
+  .mag-detail.open{ display:block; }
+  .mag-detail h3{ font-size:22px; }
+  .mag-detail p{ font-size:14.5px; line-height:1.65; color:var(--ink-soft); margin-top:10px; max-width:68ch;}
+  .mag-detail .close{ float:right; background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink-soft);}
+
+  /* ---------- Notícies ---------- */
+  .news-list{ display:flex; flex-direction:column; }
+  .news-item{
+    display:grid; grid-template-columns:90px 1fr auto; gap:20px; align-items:start;
+    padding:20px 0; border-bottom:1px solid var(--rule);
+  }
+  @media (max-width:700px){ .news-item{grid-template-columns:1fr;} }
+  .news-date{ font-family:'Zilla Slab'; font-weight:700; color:var(--brick); font-size:13px; line-height:1.3; }
+  .news-tag{ display:inline-block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
+    background:var(--slate); color:#fff; padding:2px 7px; margin-bottom:8px;}
+  .news-item h3{ font-size:17px; line-height:1.3; }
+  .news-item p{ font-size:13.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  .news-source{ font-size:11.5px; color:var(--ink-soft); text-align:right; white-space:nowrap; }
+
+  .add-news{
+    margin-top:26px; padding:20px; background:var(--card); border:1px dashed var(--rule);
+    font-size:13px; color:var(--ink-soft);
+  }
+  .add-news strong{ color:var(--ink); }
+
+  .news-form{
+    background:var(--ink); color:var(--paper); padding:26px; margin-top:26px;
+  }
+  .news-form h3{ font-size:18px; color:#fff; }
+  .news-form p.hint{ font-size:12.5px; color:#C7C4B8; margin:8px 0 18px; }
+  .news-form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+  @media (max-width:640px){ .news-form-grid{ grid-template-columns:1fr; } }
+  .news-form label{ font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#C7C4B8; display:block; margin-bottom:6px;}
+  .news-form input, .news-form textarea, .news-form select{
+    width:100%; padding:10px 12px; margin-bottom:16px; border:none; border-radius:var(--radius);
+    font-family:'Public Sans'; font-size:14px; background:#fff; color:var(--ink);
+  }
+  .news-form textarea{ resize:vertical; min-height:70px; grid-column:1 / -1; }
+  .news-form .full{ grid-column:1 / -1; }
+  .news-form-msg{ font-size:12.5px; color:#8FBF7A; min-height:16px; margin-top:-6px; margin-bottom:10px;}
+  .news-form-msg.error{ color:#E08A72; }
+  .delete-x{
+    background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:16px;
+    line-height:1; padding:2px 6px;
+  }
+  .delete-x:hover{ color:var(--brick); }
+
+  /* ---------- Floating video ---------- */
+  .video-widget{
+    position:fixed; bottom:20px; right:20px; z-index:100;
+    width:280px; background:var(--ink); border:2px solid var(--ink);
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    transition:width .2s ease, height .2s ease;
+  }
+  .video-widget.bubble{
+    width:auto; border-radius:50%; border:2px solid var(--brick);
+  }
+  .video-widget-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--ink); padding:7px 10px;
+  }
+  .video-widget.bubble .video-widget-bar{ display:none; }
+  .video-widget-bar span{
+    font-family:'Public Sans'; font-size:11px; font-weight:700; letter-spacing:0.04em;
+    text-transform:uppercase; color:var(--paper);
+  }
+  .video-widget-controls{ display:flex; gap:6px; }
+  .video-widget-controls button{
+    background:none; border:none; color:#C7C4B8; cursor:pointer; font-size:14px;
+    width:20px; height:20px; line-height:1; padding:0;
+  }
+  .video-widget-controls button:hover{ color:#fff; }
+  .video-widget video{ display:block; width:100%; height:auto; }
+  .video-widget.bubble video{ display:none; }
+  .video-bubble-btn{
+    display:none; align-items:center; justify-content:center;
+    width:56px; height:56px; border-radius:50%;
+    background:var(--brick); color:#fff; border:none; cursor:pointer;
+    font-size:20px;
+  }
+  .video-widget.bubble .video-bubble-btn{ display:flex; }
+  .video-widget.hidden{ display:none; }
+
+  /* ---------- Subscripció ---------- */
+  .plans{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    border-top:1px solid var(--ink); border-left:1px solid var(--ink);
+    margin-bottom:20px;
+  }
+  @media (max-width:860px){ .plans{grid-template-columns:1fr;} }
+  .plan{
+    border-right:1px solid var(--ink); border-bottom:1px solid var(--ink);
+    padding:30px 26px; background:var(--paper);
+    display:flex; flex-direction:column;
+  }
+  .plan.featured{ background:var(--ink); color:var(--paper); }
+  .plan .eyebrow{ margin-bottom:6px; }
+  .plan.featured .eyebrow{ color:#E8A588; }
+  .plan h3{ font-size:22px; }
+  .plan .price{ font-family:'Zilla Slab'; font-weight:700; font-size:38px; margin:14px 0 2px; }
+  .plan .price span{ font-size:14px; font-weight:500; font-family:'Public Sans'; color:var(--ink-soft); }
+  .plan.featured .price span{ color:#C7C4B8; }
+  .plan ul{ list-style:none; padding:0; margin:18px 0; flex:1; }
+  .plan li{ font-size:13.5px; padding:8px 0; border-top:1px solid var(--rule); color:var(--ink-soft); }
+  .plan.featured li{ border-top:1px solid #333527; color:#D8D5C8; }
+  .plan li::before{ content:"— "; color:var(--brick); }
+  .plan .btn{ width:100%; text-align:center; margin-top:auto; }
+
+  .sub-form{
+    background:var(--card); border:1px solid var(--rule); padding:24px 26px;
+    display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:60px;
+  }
+  .sub-form .field{ flex:1; min-width:220px; }
+  .sub-form label{ font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); display:block; margin-bottom:6px;}
+  .sub-form input{ width:100%; padding:10px 12px; border:1px solid var(--rule); font-family:'Public Sans'; font-size:14px; }
+  .sub-msg{ font-size:12.5px; color:var(--brick); width:100%; margin-top:6px; }
+
+  /* ---------- Dades ---------- */
+  .data-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:40px; align-items:start; margin-bottom:10px;}
+  @media (max-width:900px){ .data-grid{grid-template-columns:1fr;} }
+  .chart-box{ background:var(--card); border:1px solid var(--rule); padding:22px; }
+  .chart-box canvas{ max-height:320px; }
+  .stat-strip{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--rule); margin:28px 0; border:1px solid var(--rule);}
+  .stat-cell{ background:var(--paper); padding:20px; }
+  .stat-cell .n{ font-family:'Zilla Slab'; font-weight:700; font-size:30px; color:var(--brick); }
+  .stat-cell .l{ font-size:12px; color:var(--ink-soft); margin-top:4px;}
+
+  .calc{
+    background:var(--ink); color:var(--paper); padding:26px;
+  }
+  .calc h3{ font-size:18px; color:#fff; }
+  .calc p.hint{ font-size:12.5px; color:#C7C4B8; margin:8px 0 18px; }
+  .calc label{ font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#C7C4B8; display:block; margin-bottom:6px;}
+  .calc input{
+    width:100%; padding:10px 12px; margin-bottom:16px; border:none; border-radius:var(--radius);
+    font-family:'Public Sans'; font-size:15px; background:#fff; color:var(--ink);
+  }
+  .calc-result{ background:#232520; padding:16px; margin-top:6px; border-left:4px solid var(--brick);}
+  .calc-result .pct{ font-family:'Zilla Slab'; font-size:32px; font-weight:700; }
+  .calc-result .msg{ font-size:12.5px; color:#C7C4B8; margin-top:6px; line-height:1.5;}
+
+  /* ---------- Sobre ---------- */
+  .about{ display:grid; grid-template-columns:1fr 1fr; gap:50px; padding:10px 0 60px;}
+  @media (max-width:860px){ .about{grid-template-columns:1fr;} }
+  .about p{ font-size:15px; line-height:1.7; color:var(--ink-soft); margin-top:14px; max-width:52ch;}
+  .pull{
+    font-family:'Zilla Slab'; font-style:italic; font-size:22px; line-height:1.4;
+    border-left:3px solid var(--brick); padding-left:18px; margin:18px 0; color:var(--ink);
+  }
+
+  footer{
+    border-top:2px solid var(--ink); margin-top:20px; padding:26px 0 40px;
+    font-size:12px; color:var(--ink-soft);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span id="today"></span>
+    <span>Un projecte del Treball de Recerca de Batxillerat</span>
+  </div>
+  <div class="masthead-main">
+    <div class="logo">L'Habitatge d'Avui</div>
+    <div class="tagline">L'habitatge és un dret, no un privilegi.</div>
+  </div>
+</header>
+
+<nav class="primary">
+  <ul>
+    <li><button class="tab active" data-view="inici">Inici</button></li>
+    <li><button class="tab" data-view="revista">Revista</button></li>
+    <li><button class="tab" data-view="noticies">Notícies</button></li>
+    <li><button class="tab" data-view="dades">Dades i calculadora</button></li>
+    <li><button class="tab" data-view="sobre">Sobre el projecte</button></li>
+    <li><button class="tab" data-view="subscripcio">Subscriu-te</button></li>
+  </ul>
+</nav>
+
+<!-- ================= INICI ================= -->
+<section class="view active" id="view-inici">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Consells per a joves — número 1</div>
+        <h1 class="display">Emancipar-se avui és <em>car, lent i complicat.</em> Aquí t'expliquem per què.</h1>
+        <p class="lede">Una revista i un butlletí de notícies fets per una jove de Cadaqués, dins el seu Treball de Recerca, per entendre la crisi de l'habitatge a Espanya — i per ajudar-te a moure't per un mercat que sembla fet perquè no hi arribis.</p>
+        <div class="hero-actions">
+          <button class="btn" onclick="showView('revista')">Llegir la revista</button>
+          <button class="btn ghost" onclick="showView('dades')">Veure les dades</button>
+        </div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-row"><span class="label">Preu m² · 2007</span><span class="val">2.070 €</span></div>
+        <div class="ticket-row"><span class="label">Preu m² · 2020</span><span class="val">1.383 €</span></div>
+        <div class="ticket-row"><span class="label">Preu m² · 2025</span><span class="val up">2.186 €</span></div>
+        <div class="ticket-row"><span class="label">Edat mitjana d'emancipació</span><span class="val">30,4 anys</span></div>
+        <div class="ticket-foot">Font: Consejo General del Notariado · Observatori d'Emancipació</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="section-head"><h2>Últimes notícies</h2><div class="rule"></div><span class="count">veure totes →</span></div>
+    <div class="news-list" id="mini-news"></div>
+  </div>
+</section>
+
+<!-- ================= REVISTA ================= -->
+<section class="view" id="view-revista">
+  <div class="wrap">
+    <div class="section-head" style="margin-top:44px;"><h2>Consells per a joves</h2><div class="rule"></div><span class="count">6 seccions</span></div>
+    <div class="mag-grid" id="mag-grid"></div>
+    <div class="mag-detail" id="mag-detail">
+      <button class="close" onclick="closeDetail()">×</button>
+      <div class="eyebrow" id="detail-eyebrow"></div>
+      <h3 id="detail-title"></h3>
+      <p id="detail-body"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NOTICIES ================= -->
+<section class="view" id="view-noticies">
+  <div class="wrap">
+    <div class="section-head" style="margin-top:44px;"><h2>Notícies sobre habitatge</h2><div class="rule"></div><span class="count" id="news-count"></span></div>
+    <div class="news-list" id="news-full"></div>
+
+    <div class="news-form" id="news-form" style="display:none;">
+      <h3>Afegir una notícia</h3>
+      <p class="hint">Es publicarà directament a la web, visible per a qualsevol persona que la visiti.</p>
+      <div class="news-form-grid">
+        <div>
+          <label for="nf-date">Data (ex: AGO 2026)</label>
+          <input type="text" id="nf-date" placeholder="AGO 2026">
+        </div>
+        <div>
+          <label for="nf-tag">Categoria</label>
+          <select id="nf-tag">
+            <option>Preus</option>
+            <option>Llei</option>
+            <option>Joves</option>
+            <option>Dades</option>
+            <option>Altres</option>
+          </select>
+        </div>
+        <div class="full">
+          <label for="nf-title">Titular</label>
+          <input type="text" id="nf-title" placeholder="Titular de la notícia">
+        </div>
+        <div class="full">
+          <label for="nf-body">Text breu</label>
+          <textarea id="nf-body" placeholder="Dues o tres frases resumint la notícia"></textarea>
+        </div>
+        <div>
+          <label for="nf-src">Font</label>
+          <input type="text" id="nf-src" placeholder="Ex: El País, INE...">
+        </div>
+      </div>
+      <div class="news-form-msg" id="nf-msg"></div>
+      <button class="btn" onclick="addNews()">Publicar notícia</button>
+    </div>
+
+    <div style="margin-top:26px; text-align:right;" id="editor-lock-box">
+      <button class="btn ghost" id="editor-toggle" onclick="showLockInput()" style="font-size:11px; padding:8px 14px;">Editora</button>
+      <div id="lock-input-row" style="display:none; justify-content:flex-end; gap:8px; margin-top:10px;">
+        <input type="password" id="editor-pass-input" placeholder="Contrasenya" style="max-width:180px; padding:9px 12px; border:1px solid var(--rule); font-family:'Public Sans'; font-size:13px;">
+        <button class="btn" style="padding:9px 16px; font-size:11px;" onclick="unlockEditor()">Entrar</button>
+      </div>
+      <div id="lock-error" style="font-size:11.5px; color:var(--brick); margin-top:6px;"></div>
+    </div>
+
+    <div class="add-news"><strong>Nota de la redactora:</strong> aquesta secció s'anirà actualitzant amb notícies noves sobre el mercat de l'habitatge, lleis i dades a mesura que vagin sortint.</div>
+  </div>
+</section>
+
+<!-- ================= DADES ================= -->
+<section class="view" id="view-dades">
+  <div class="wrap">
+    <div class="section-head" style="margin-top:44px;"><h2>El mercat en xifres</h2><div class="rule"></div></div>
+    <div class="data-grid">
+      <div class="chart-box">
+        <canvas id="priceChart"></canvas>
+      </div>
+      <div>
+        <div class="stat-strip">
+          <div class="stat-cell"><div class="n">73,7%</div><div class="l">Població espanyola en propietat (Eurostat, 2024)</div></div>
+          <div class="stat-cell"><div class="n">7,8</div><div class="l">Anys de salari íntegre per comprar un pis (2026)</div></div>
+          <div class="stat-cell"><div class="n">13,29 €</div><div class="l">Lloguer per m² al mes, mitjana Espanya (2024)</div></div>
+          <div class="stat-cell"><div class="n">1 de cada 4</div><div class="l">Llars amb dificultats d'habitatge (Càritas, 2024)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head"><h2>Calculadora de sobreesforç</h2><div class="rule"></div></div>
+    <div class="data-grid">
+      <div class="calc">
+        <h3>Quant del teu sou et menjaria el lloguer?</h3>
+        <p class="hint">Introdueix el teu sou net mensual i el lloguer que estàs mirant. Els experts recomanen no superar el 30-35%.</p>
+        <label for="salary">Sou net mensual (€)</label>
+        <input type="number" id="salary" placeholder="Ex: 1200">
+        <label for="rent">Lloguer mensual (€)</label>
+        <input type="number" id="rent" placeholder="Ex: 800">
+        <div class="calc-result">
+          <div class="pct" id="calc-pct">—</div>
+          <div class="msg" id="calc-msg">Omple els dos camps per veure el resultat.</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:14px; line-height:1.7; color:var(--ink-soft);">La regla del <strong>30-35%</strong> és el llindar que el Banc d'Espanya i la majoria d'experts financers consideren segur per destinar a l'habitatge sense posar en risc la capacitat d'estalvi de la llar. Superar el 40% es considera <strong>sobreesforç sever</strong>.</p>
+        <p style="font-size:14px; line-height:1.7; color:var(--ink-soft); margin-top:14px;">A Espanya, el 20% de les llars amb menys renda hi dediquen ja més del 70% dels seus ingressos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOBRE ================= -->
+<section class="view" id="view-sobre">
+  <div class="wrap about">
+    <div>
+      <div class="eyebrow">El projecte</div>
+      <h2 style="font-size:32px; margin-top:8px;">Per què aquesta web</h2>
+      <p>Aquesta web neix com la part pràctica del meu Treball de Recerca de Batxillerat sobre la crisi de l'habitatge a Espanya. L'objectiu és traduir les dades i l'anàlisi del treball en alguna cosa útil i llegidora per a altres joves que, com jo, es plantegen en pocs anys el repte d'emancipar-se.</p>
+      <div class="pull">"M'interessa entendre millor què està passant i per què els preus han pujat tant."</div>
+      <p>La revista "Consells per a joves" recull consells pràctics, entrevistes a professionals del sector (banca, notariat, immobiliàries, propietaris) i una explicació de per què accedir a un habitatge s'ha tornat tan difícil.</p>
+    </div>
+    <div>
+      <div class="eyebrow">Com fer servir la web</div>
+      <h2 style="font-size:32px; margin-top:8px;">Segueix explorant</h2>
+      <p><strong>Revista:</strong> les sis seccions de "Consells per a joves", en format article.</p>
+      <p><strong>Notícies:</strong> un feed que s'anirà actualitzant amb novetats sobre lleis, preus i mercat.</p>
+      <p><strong>Dades:</strong> els gràfics i xifres clau del treball, més una calculadora perquè cadascú vegi el seu propi cas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUBSCRIPCIÓ ================= -->
+<section class="view" id="view-subscripcio">
+  <div class="wrap">
+    <div class="section-head" style="margin-top:44px;"><h2>Subscriu-te</h2><div class="rule"></div></div>
+    <p style="font-size:15px; color:var(--ink-soft); max-width:60ch; margin-bottom:34px;">Rep les notícies i els articles de "L'Habitatge d'Avui" directament, i dona suport a un periodisme jove i independent sobre la crisi de l'habitatge.</p>
+
+    <div class="plans">
+      <div class="plan">
+        <div class="eyebrow">Gratuïta</div>
+        <h3>Lectora</h3>
+        <div class="price">0 €<span> / sempre</span></div>
+        <ul>
+          <li>Accés a tots els articles de la revista</li>
+          <li>Accés al feed de notícies</li>
+          <li>Calculadora de sobreesforç</li>
+        </ul>
+        <button class="btn ghost">Ja hi tens accés</button>
+      </div>
+      <div class="plan featured">
+        <div class="eyebrow">La més popular</div>
+        <h3>Subscriptora</h3>
+        <div class="price">3 €<span> / mes</span></div>
+        <ul>
+          <li>Tot el pla Lectora</li>
+          <li>Newsletter setmanal per correu</li>
+          <li>Accés anticipat als articles nous</li>
+          <li>Sense anuncis</li>
+        </ul>
+        <button class="btn" style="background:var(--brick); border-color:var(--brick);">Subscriu-te</button>
+      </div>
+      <div class="plan">
+        <div class="eyebrow">Per a professionals</div>
+        <h3>Suport</h3>
+        <div class="price">8 €<span> / mes</span></div>
+        <ul>
+          <li>Tot el pla Subscriptora</li>
+          <li>Informes trimestrals en PDF</li>
+          <li>Menció com a mecenes al peu de la web</li>
+        </ul>
+        <button class="btn ghost">Subscriu-te</button>
+      </div>
+    </div>
+
+    <div class="sub-form">
+      <div class="field">
+        <label for="sub-email">El teu correu</label>
+        <input type="email" id="sub-email" placeholder="nom@exemple.com">
+      </div>
+      <button class="btn" onclick="joinNewsletter()">Rebre la newsletter gratuïta</button>
+      <div class="sub-msg" id="sub-msg"></div>
+    </div>
+
+    <p style="font-size:12px; color:var(--ink-soft); margin-top:-40px; margin-bottom:50px;">Nota: els pagaments encara no estan actius — aquesta secció és una maqueta de com funcionarà la subscripció de pagament.</p>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>L'Habitatge d'Avui — Treball de Recerca, Batxillerat</span>
+  <span>Fonts: INE, Eurostat, Banc d'Espanya, Càritas, Fotocasa, MIVAU</span>
+</footer>
+
+<div class="video-widget" id="video-widget">
+  <div class="video-widget-bar">
+    <span>Vídeo destacat</span>
+    <div class="video-widget-controls">
+      <button onclick="minimizeVideo()" title="Minimitzar">–</button>
+      <button onclick="closeVideo()" title="Tancar">×</button>
+    </div>
+  </div>
+  <video id="featured-video" controls poster="" muted loop>
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+    El teu navegador no admet vídeo.
+  </video>
+  <button class="video-bubble-btn" onclick="expandVideo()" title="Obrir vídeo">▶</button>
+</div>
+
+<script>
+  // ---- Nav ----
+  function showView(name){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===name));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>showView(t.dataset.view)));
+
+  // ---- Date ----
+  document.getElementById('today').textContent = new Date().toLocaleDateString('ca-ES', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  // ---- Magazine sections ----
+  const magazine = [
+    {title:"Comprar o llogar?", body:"Les dues cares de la mateixa moneda: avantatges, riscos i quan té sentit cadascuna opció segons la teva situació econòmica i laboral."},
+    {title:"Com buscar un habitatge de manera fàcil i segura", body:"Portals fiables, senyals d'alerta d'estafes de lloguer, i com preparar-te la documentació abans de començar a buscar."},
+    {title:"Per què és difícil accedir a un habitatge?", body:"Salaris, preus, inflació, turisme i especulació: un resum clar de les causes que expliquen la crisi actual."},
+    {title:"Ajuts i subvencions disponibles", body:"Bo Jove de Lloguer, avals ICO per a joves i altres ajudes públiques a nivell estatal i autonòmic."},
+    {title:"Entrevistes i opinions", body:"Parlem amb una directora financera d'INCASÒL, un director de banca, algú del sector immobiliari, un propietari d'Airbnb i un notari."},
+    {title:"Conclusions", body:"Què hem après i cap on sembla que va el mercat de l'habitatge per als joves dels propers anys."},
+  ];
+  const magGrid = document.getElementById('mag-grid');
+  magazine.forEach((m,i)=>{
+    const card = document.createElement('div');
+    card.className='mag-card';
+    card.innerHTML = `<div class="mag-num">0${i+1}</div><h3>${m.title}</h3><p>${m.body}</p><div class="read">Llegir →</div>`;
+    card.onclick = ()=>openDetail(m);
+    magGrid.appendChild(card);
+  });
+  function openDetail(m){
+    document.getElementById('detail-eyebrow').textContent = 'Consells per a joves';
+    document.getElementById('detail-title').textContent = m.title;
+    document.getElementById('detail-body').textContent = m.body + " — (aquí hi anirà el text complet de l'article un cop redactat.)";
+    document.getElementById('mag-detail').classList.add('open');
+    document.getElementById('mag-detail').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  function closeDetail(){ document.getElementById('mag-detail').classList.remove('open'); }
+
+  // ---- Editor lock ----
+  const EDITOR_PASS = "Vodkaman2009";
+  let isEditor = false;
+  function showLockInput(){
+    document.getElementById('lock-input-row').style.display = 'flex';
+    document.getElementById('editor-pass-input').focus();
+  }
+  function unlockEditor(){
+    const attempt = document.getElementById('editor-pass-input').value;
+    const errBox = document.getElementById('lock-error');
+    if(attempt === EDITOR_PASS){
+      isEditor = true;
+      document.getElementById('news-form').style.display = 'block';
+      document.getElementById('editor-lock-box').style.display = 'none';
+      renderNews(document.getElementById('news-full'));
+    } else {
+      errBox.textContent = 'Contrasenya incorrecta.';
+    }
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const passInput = document.getElementById('editor-pass-input');
+    if(passInput){
+      passInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') unlockEditor(); });
+    }
+  });
+
+  // ---- News ----
+  const defaultNews = [
+    {date:"AGO 2026", tag:"Preus", title:"El lloguer torna a batre rècords a l'estiu de 2026", body:"La mitjana nacional s'acosta als 14 €/m² al mes, amb Barcelona i Madrid molt per sobre.", src:"Idealista"},
+    {date:"JUL 2026", tag:"Llei", title:"Noves obligacions per als pisos turístics", body:"Tots els habitatges d'ús turístic han de mostrar el seu número de registre a les plataformes.", src:"MIVAU"},
+    {date:"JUN 2026", tag:"Joves", title:"L'edat d'emancipació torna a pujar a Espanya", body:"Se situa en 30,4 anys, quatre per sobre de la mitjana europea, segons l'Observatori d'Emancipació.", src:"Observatori d'Emancipació"},
+    {date:"MAI 2026", tag:"Dades", title:"Càritas alerta que 1 de cada 4 llars té problemes d'habitatge", body:"L'informe anual xifra en 4,6 milions les llars afectades a tot l'Estat.", src:"Càritas"},
+  ];
+  let news = [];
+
+  async function loadNews(){
+    try{
+      const result = await window.storage.get('news-items', true);
+      news = result && result.value ? JSON.parse(result.value) : defaultNews;
+    }catch(e){
+      news = defaultNews;
+    }
+    renderNews(document.getElementById('mini-news'), 3);
+    renderNews(document.getElementById('news-full'));
+    document.getElementById('news-count').textContent = news.length + ' articles';
+  }
+
+  async function saveNews(){
+    try{
+      await window.storage.set('news-items', JSON.stringify(news), true);
+    }catch(e){
+      console.error('No s\'ha pogut guardar la notícia', e);
+    }
+  }
+
+  function renderNews(container, limit){
+    const list = limit ? news.slice(0,limit) : news;
+    if(list.length === 0){
+      container.innerHTML = '<p style="color:var(--ink-soft); font-size:13.5px; padding:20px 0;">Encara no hi ha notícies publicades.</p>';
+      return;
+    }
+    container.innerHTML = list.map((n,i)=>`
+      <div class="news-item">
+        <div class="news-date">${escapeHtml(n.date)}</div>
+        <div>
+          <span class="news-tag">${escapeHtml(n.tag)}</span>
+          <h3>${escapeHtml(n.title)}</h3>
+          <p>${escapeHtml(n.body)}</p>
+        </div>
+        <div class="news-source">
+          ${escapeHtml(n.src)}
+          ${(limit || !isEditor) ? '' : `<br><button class="delete-x" onclick="deleteNews(${news.indexOf(n)})" title="Eliminar">Eliminar ×</button>`}
+        </div>
+      </div>`).join('');
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
+  async function addNews(){
+    const date = document.getElementById('nf-date').value.trim();
+    const tag = document.getElementById('nf-tag').value;
+    const title = document.getElementById('nf-title').value.trim();
+    const body = document.getElementById('nf-body').value.trim();
+    const src = document.getElementById('nf-src').value.trim();
+    const msg = document.getElementById('nf-msg');
+
+    if(!date || !title || !body || !src){
+      msg.textContent = 'Omple tots els camps abans de publicar.';
+      msg.classList.add('error');
+      return;
+    }
+    msg.classList.remove('error');
+    msg.textContent = 'Publicant...';
+
+    news.unshift({date, tag, title, body, src});
+    await saveNews();
+    renderNews(document.getElementById('mini-news'), 3);
+    renderNews(document.getElementById('news-full'));
+    document.getElementById('news-count').textContent = news.length + ' articles';
+
+    document.getElementById('nf-date').value = '';
+    document.getElementById('nf-title').value = '';
+    document.getElementById('nf-body').value = '';
+    document.getElementById('nf-src').value = '';
+    msg.textContent = 'Notícia publicada correctament.';
+    setTimeout(()=>{ msg.textContent=''; }, 3000);
+  }
+
+  async function deleteNews(index){
+    news.splice(index,1);
+    await saveNews();
+    renderNews(document.getElementById('mini-news'), 3);
+    renderNews(document.getElementById('news-full'));
+    document.getElementById('news-count').textContent = news.length + ' articles';
+  }
+
+  loadNews();
+
+  // ---- Floating video ----
+  function minimizeVideo(){
+    const w = document.getElementById('video-widget');
+    document.getElementById('featured-video').pause();
+    w.classList.add('bubble');
+  }
+  function expandVideo(){
+    const w = document.getElementById('video-widget');
+    w.classList.remove('bubble');
+  }
+  function closeVideo(){
+    const w = document.getElementById('video-widget');
+    document.getElementById('featured-video').pause();
+    w.classList.add('hidden');
+  }
+
+
+  // ---- Chart ----
+  new Chart(document.getElementById('priceChart'), {
+    type:'line',
+    data:{
+      labels:['2007','2010','2014','2018','2020','2022','2024','2025'],
+      datasets:[{
+        label:'€/m² (compra)',
+        data:[2070,1750,1360,1500,1383,1650,2050,2186],
+        borderColor:'#C2401F', backgroundColor:'rgba(194,64,31,0.12)',
+        borderWidth:2.5, tension:0.35, fill:true, pointRadius:3
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{ legend:{display:false}, title:{display:true, text:'Preu mitjà de l\'habitatge (€/m²) — Espanya', font:{family:"'Zilla Slab'", size:14, weight:'600'}, color:'#181A17'} },
+      scales:{
+        y:{ beginAtZero:false, grid:{color:'#DCD7C8'}, ticks:{color:'#4B4C46'} },
+        x:{ grid:{display:false}, ticks:{color:'#4B4C46'} }
+      }
+    }
+  });
+
+  // ---- Calculator ----
+  const salaryInput = document.getElementById('salary');
+  const rentInput = document.getElementById('rent');
+  function calc(){
+    const s = parseFloat(salaryInput.value);
+    const r = parseFloat(rentInput.value);
+    const pctEl = document.getElementById('calc-pct');
+    const msgEl = document.getElementById('calc-msg');
+    if(!s || !r){ pctEl.textContent='—'; msgEl.textContent='Omple els dos camps per veure el resultat.'; return; }
+    const pct = (r/s*100);
+    pctEl.textContent = pct.toFixed(1)+'%';
+    if(pct <= 30){ msgEl.textContent = "Dins del marge recomanat (fins al 30-35%). Et queda marge per estalviar."; }
+    else if(pct <= 40){ msgEl.textContent = "Una mica per sobre del llindar recomanat. Encara assumible, però amb poc marge d'estalvi."; }
+    else { msgEl.textContent = "Sobreesforç sever: més del 40% del sou destinat a l'habitatge. Molt per sobre del que recomanen els experts."; }
+  }
+  salaryInput.addEventListener('input', calc);
+  rentInput.addEventListener('input', calc);
+</script>
+</body>
+</html>
