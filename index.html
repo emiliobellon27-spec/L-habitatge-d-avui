@@ -542,6 +542,9 @@
   }
   .poll-option:hover{ border-color:var(--brick); }
   .poll-result-row{ margin-bottom:10px; }
+  .poll-result-row.clickable{ cursor:pointer; padding:4px; margin:-4px -4px 6px; border-radius:6px; transition:background .15s ease; }
+  .poll-result-row.clickable:hover{ background:var(--paper-2); }
+  .poll-result-row.clickable:hover .poll-result-bar{ background:var(--brick-dark); }
   .poll-result-label{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px; }
   .poll-result-bar-bg{ background:var(--rule); border-radius:6px; height:14px; overflow:hidden; }
   .poll-result-bar{ background:var(--brick); height:100%; border-radius:6px; transition:width .4s ease; }
@@ -2856,6 +2859,8 @@
     container.innerHTML = pollQuestions.map(q => renderPollCard(q)).join('');
   }
   function renderPollCard(q){
+    // Primer es vota; un cop votat, surten els resultats (la barra més llarga
+    // = més respostes per aquella opció) i el total de respostes.
     const voted = myVotes[q.id];
     const counts = pollVotes[q.id] || {};
     if(!voted){
@@ -2914,12 +2919,15 @@
   let adFilter = 'tots';
   let adCityFilter = 'totes';
   function cityOf(a){ return (a && a.zone ? a.zone : '').split(',')[0].trim(); }
+  function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+  function ensureIds(list){ list.forEach(item=>{ if(!item.id) item.id = genId(); }); return list; }
 
   async function loadAds(){
     try{
       const result = await window.storage.get('flat-ads', true);
-      adsList = result && result.value ? JSON.parse(result.value) : defaultAdsList;
-    }catch(e){ adsList = defaultAdsList; }
+      adsList = result && result.value ? JSON.parse(result.value) : defaultAdsList.slice();
+    }catch(e){ adsList = defaultAdsList.slice(); }
+    ensureIds(adsList);
     renderAds();
   }
   async function saveAds2(){
@@ -3012,7 +3020,7 @@
           <p>${escapeHtml(a.desc)}</p>
           ${vibesHtml}
           <div class="ad-contact">Contacte: ${escapeHtml(a.contact)}</div>
-          ${isEditor ? `<button class="delete-x" onclick="deleteAd(${i})" style="margin-top:8px;" title="Eliminar">Eliminar ×</button>` : ''}
+          ${isEditor ? `<button class="delete-x" onclick="deleteAd('${a.id}')" style="margin-top:8px;" title="Eliminar">Eliminar ×</button>` : ''}
         </div>`;
   }
   function renderAds(){
@@ -3133,7 +3141,7 @@
     msg.textContent = 'Publicant...';
 
     const date = new Date().toLocaleDateString('ca-ES', {month:'short', year:'numeric'});
-    const newAd = {type: adFormType, name, zone, budget: budget?parseInt(budget):null, when, duration, desc, contact, vibes, date};
+    const newAd = {id: genId(), type: adFormType, name, zone, budget: budget?parseInt(budget):null, when, duration, desc, contact, vibes, date};
     const photoInfo = adPhotoData[prefix];
     if(photoInfo){ newAd.photo = photoInfo.b64; newAd.photoMime = photoInfo.mime; }
     // Tornem a llegir l'últim llistat compartit abans d'escriure, perquè si dues
@@ -3142,6 +3150,7 @@
       const result = await window.storage.get('flat-ads', true);
       if(result && result.value) adsList = JSON.parse(result.value);
     }catch(e){}
+    ensureIds(adsList);
     adsList.unshift(newAd);
     await saveAds2();
     renderAds();
@@ -3159,8 +3168,16 @@
     msg.textContent = 'Anunci publicat! Ja ets a la llista.';
     setTimeout(()=>{ msg.textContent=''; }, 3000);
   }
-  async function deleteAd(i){
-    adsList.splice(i,1);
+  async function deleteAd(id){
+    if(!confirm('Segur que vols eliminar aquest anunci?')) return;
+    // Rellegim l'últim llistat compartit abans d'escriure, per no esborrar per
+    // error un anunci que algú altre hagi publicat just després que carreguessis la pàgina.
+    try{
+      const result = await window.storage.get('flat-ads', true);
+      if(result && result.value) adsList = JSON.parse(result.value);
+    }catch(e){}
+    ensureIds(adsList);
+    adsList = adsList.filter(a=>a.id!==id);
     await saveAds2();
     renderAds();
   }
@@ -3277,10 +3294,11 @@
   async function loadNews(){
     try{
       const result = await window.storage.get('news-items', true);
-      news = result && result.value ? JSON.parse(result.value) : defaultNews;
+      news = result && result.value ? JSON.parse(result.value) : defaultNews.slice();
     }catch(e){
-      news = defaultNews;
+      news = defaultNews.slice();
     }
+    ensureIds(news);
     renderNews(document.getElementById('mini-news'), 3);
     renderNews(document.getElementById('news-full'));
     document.getElementById('news-count').textContent = news.length + ' articles';
@@ -3321,7 +3339,7 @@
         </div>
         <div class="news-source">
           ${srcHtml}
-          ${(limit || !isEditor) ? '' : `<br><button class="delete-x" onclick="event.stopPropagation(); deleteNews(${i})" title="Eliminar">Eliminar ×</button>`}
+          ${(limit || !isEditor) ? '' : `<br><button class="delete-x" onclick="event.stopPropagation(); deleteNews('${n.id}')" title="Eliminar">Eliminar ×</button>`}
         </div>
       </div>`;
     }).join('');
@@ -3369,7 +3387,14 @@
     msg.classList.remove('error');
     msg.textContent = 'Publicant...';
 
-    news.unshift({date, tag, title, body, full: full || body, src, url: url || ''});
+    // Rellegim l'última llista compartida abans d'escriure, per si hi ha hagut
+    // algun altre canvi (p. ex. des d'un altre dispositiu) des que vas carregar la pàgina.
+    try{
+      const result = await window.storage.get('news-items', true);
+      if(result && result.value) news = JSON.parse(result.value);
+    }catch(e){}
+    ensureIds(news);
+    news.unshift({id: genId(), date, tag, title, body, full: full || body, src, url: url || ''});
     await saveNews();
     renderNews(document.getElementById('mini-news'), 3);
     renderNews(document.getElementById('news-full'));
@@ -3385,8 +3410,14 @@
     setTimeout(()=>{ msg.textContent=''; }, 3000);
   }
 
-  async function deleteNews(index){
-    news.splice(index,1);
+  async function deleteNews(id){
+    if(!confirm('Segur que vols eliminar aquesta notícia?')) return;
+    try{
+      const result = await window.storage.get('news-items', true);
+      if(result && result.value) news = JSON.parse(result.value);
+    }catch(e){}
+    ensureIds(news);
+    news = news.filter(n=>n.id!==id);
     await saveNews();
     renderNews(document.getElementById('mini-news'), 3);
     renderNews(document.getElementById('news-full'));
