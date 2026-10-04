@@ -1358,6 +1358,7 @@
         <span>✓ Sense agències pel mig</span>
       </div>
       <div class="ad-stats" id="ad-stats"></div>
+      <button class="btn ghost" id="ad-reset-btn" onclick="resetAdsToDefaults()" style="display:none; font-size:11px; padding:8px 14px; margin-top:4px;">Restaurar anuncis de mostra (amb fotos)</button>
     </div>
 
     <div class="map-toggle">
@@ -2259,6 +2260,15 @@
     if(aidBtn) aidBtn.style.display = 'block';
     const headerBtn = document.getElementById('header-editor-btn');
     if(headerBtn) headerBtn.textContent = 'Editora ✓';
+    const adResetBtn = document.getElementById('ad-reset-btn');
+    if(adResetBtn) adResetBtn.style.display = 'inline-block';
+    renderAds();
+  }
+  async function resetAdsToDefaults(){
+    if(!confirm('Això substituirà TOTS els anuncis actuals (de tothom) pels anuncis de mostra originals, amb les seves fotos. No es pot desfer. Vols continuar?')) return;
+    adsList = JSON.parse(JSON.stringify(defaultAdsList));
+    ensureIds(adsList);
+    await saveAds2();
     renderAds();
   }
   async function unlockEditor(){
@@ -2969,7 +2979,20 @@
       adsList = result && result.value ? JSON.parse(result.value) : defaultAdsList.slice();
     }catch(e){ adsList = defaultAdsList.slice(); }
     ensureIds(adsList);
+    // Migració automàtica: si els anuncis de mostra ja estaven guardats sense
+    // fotos (de proves anteriors), els hi posem les fotos dels de mostra.
+    let migrated = false;
+    defaultAdsList.forEach(def=>{
+      if(!def.photos || !def.photos.length) return;
+      adsList.forEach(a=>{
+        if(a.name === def.name && a.type === def.type && !(a.photos && a.photos.length) && !a.photo){
+          a.photos = def.photos;
+          migrated = true;
+        }
+      });
+    });
     renderAds();
+    if(migrated){ saveAds2(); }
   }
   async function saveAds2(){
     try{ await window.storage.set('flat-ads', JSON.stringify(adsList), true); }
