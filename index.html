@@ -2879,6 +2879,12 @@
     </div>`;
   }
   async function votePoll(qId, optId){
+    // Tornem a llegir l'últim valor compartit abans d'escriure, perquè si dues
+    // persones voten gairebé alhora no es trepitgin els vots l'una a l'altra.
+    try{
+      const result = await window.storage.get('poll-votes', true);
+      if(result && result.value) pollVotes = JSON.parse(result.value);
+    }catch(e){}
     if(!pollVotes[qId]) pollVotes[qId] = {};
     pollVotes[qId][optId] = (pollVotes[qId][optId]||0) + 1;
     myVotes[qId] = optId;
@@ -3130,6 +3136,12 @@
     const newAd = {type: adFormType, name, zone, budget: budget?parseInt(budget):null, when, duration, desc, contact, vibes, date};
     const photoInfo = adPhotoData[prefix];
     if(photoInfo){ newAd.photo = photoInfo.b64; newAd.photoMime = photoInfo.mime; }
+    // Tornem a llegir l'últim llistat compartit abans d'escriure, perquè si dues
+    // persones publiquen un anunci gairebé alhora no es trepitgin l'una a l'altra.
+    try{
+      const result = await window.storage.get('flat-ads', true);
+      if(result && result.value) adsList = JSON.parse(result.value);
+    }catch(e){}
     adsList.unshift(newAd);
     await saveAds2();
     renderAds();
