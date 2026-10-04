@@ -19,7 +19,18 @@ const ALLOWED_KEYS = new Set([
 exports.handler = async function (event) {
   let store;
   try {
-    store = getStore("habitatge-data");
+    // Normalment Netlify configura Netlify Blobs automàticament, però en
+    // aquest projecte cal indicar-ho manualment amb el Site ID i un token
+    // (es guarden com a variables d'entorn a Netlify, no aquí al codi).
+    if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_BLOBS_TOKEN) {
+      store = getStore({
+        name: "habitatge-data",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+      });
+    } else {
+      store = getStore("habitatge-data");
+    }
   } catch (err) {
     return {
       statusCode: 500,
